@@ -1,0 +1,466 @@
+<div class="container-fluid py-4">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading application details...</p>
+  </div>
+
+  <!-- Application Details -->
+  <div *ngIf="!loading && application">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/applications">Applications</a></li>
+            <li class="breadcrumb-item active">Application Details</li>
+          </ol>
+        </nav>
+        <h1 class="h2 mb-2">{{ application.candidateName }}</h1>
+        <p class="text-muted mb-0">
+          Application for <a [routerLink]="['/jobs', application.jobId]" class="text-decoration-none">{{ application.jobTitle }}</a>
+        </p>
+      </div>
+      <div class="col-auto">
+        <div class="btn-group" role="group">
+          <button class="btn btn-outline-primary" (click)="openStageModal()">
+            <i class="fas fa-arrow-right me-1"></i>Move Stage
+          </button>
+          <button class="btn btn-outline-info" (click)="openAssignModal()">
+            <i class="fas fa-user-plus me-1"></i>Assign
+          </button>
+          <button class="btn btn-outline-success" (click)="openOfferModal()" *ngIf="application.status !== 4 && application.status !== 5">
+            <i class="fas fa-handshake me-1"></i>Make Offer
+          </button>
+          <button class="btn btn-outline-danger" (click)="openRejectModal()" *ngIf="application.status !== 6">
+            <i class="fas fa-times me-1"></i>Reject
+          </button>
+          <button class="btn btn-outline-secondary" (click)="openNotesModal()">
+            <i class="fas fa-sticky-note me-1"></i>Notes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Status Card -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Application Status</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="text-muted small">Current Status</label>
+                <div>
+                  <span [class]="getStatusBadgeClass(application.status)">
+                    {{ getStatusText(application.status) }}
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="text-muted small">Current Stage</label>
+                <div>
+                  <span class="badge bg-secondary">{{ getStageText(application.stage) }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Applied Date</label>
+                <p class="mb-0">{{ application.appliedDate | date: 'MMMM d, y' }}</p>
+              </div>
+              <div class="col-md-6" *ngIf="application.aiScore">
+                <label class="text-muted small">AI Match Score</label>
+                <div>
+                  <span [ngClass]="getScoreClass(application.aiScore)" class="h4">
+                    <strong>{{ application.aiScore | number: '1.0-0' }}%</strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Candidate Information -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Candidate Information</h5>
+            <dl class="row mb-0">
+              <dt class="col-sm-3">Name</dt>
+              <dd class="col-sm-9">
+                <a [routerLink]="['/candidates', application.candidateId]" class="text-decoration-none">
+                  {{ application.candidateName }}
+                </a>
+              </dd>
+              <dt class="col-sm-3">Email</dt>
+              <dd class="col-sm-9">
+                <a [href]="'mailto:' + application.candidateEmail">{{ application.candidateEmail }}</a>
+              </dd>
+              <dt class="col-sm-3">Applied Date</dt>
+              <dd class="col-sm-9">{{ application.appliedDate | date: 'MMMM d, y, h:mm a' }}</dd>
+              <dt class="col-sm-3" *ngIf="application.assignedToName">Assigned To</dt>
+              <dd class="col-sm-9" *ngIf="application.assignedToName">{{ application.assignedToName }}</dd>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Job Information -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Job Information</h5>
+            <dl class="row mb-0">
+              <dt class="col-sm-3">Job Title</dt>
+              <dd class="col-sm-9">
+                <a [routerLink]="['/jobs', application.jobId]" class="text-decoration-none">
+                  {{ application.jobTitle }}
+                </a>
+              </dd>
+              <dt class="col-sm-3" *ngIf="application.departmentName">Department</dt>
+              <dd class="col-sm-9" *ngIf="application.departmentName">{{ application.departmentName }}</dd>
+            </dl>
+          </div>
+        </div>
+
+        <!-- AI Analysis -->
+        <div class="card shadow-sm mb-4" *ngIf="application.aiScore">
+          <div class="card-body">
+            <h5 class="card-title mb-3">AI Match Analysis</h5>
+            <div class="text-center mb-3">
+              <div class="score-circle-large d-inline-flex" [ngClass]="getScoreClass(application.aiScore)">
+                {{ application.aiScore | number: '1.0-0' }}
+              </div>
+              <p class="text-muted small mb-0 mt-2">Overall Match Score</p>
+            </div>
+            <div *ngIf="application.aiMatchSummary">
+              <h6>Summary</h6>
+              <p class="small">{{ application.aiMatchSummary }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cover Letter -->
+        <div class="card shadow-sm mb-4" *ngIf="application.coverLetter">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Cover Letter</h5>
+            <p class="whitespace-pre-line mb-0">{{ application.coverLetter }}</p>
+          </div>
+        </div>
+
+        <!-- Review Notes -->
+        <div class="card shadow-sm mb-4" *ngIf="application.reviewNotes">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Review Notes</h5>
+            <p class="mb-0">{{ application.reviewNotes }}</p>
+            <div *ngIf="application.rating" class="mt-2">
+              <small class="text-muted">Rating: </small>
+              <span *ngFor="let i of [1,2,3,4,5]" class="text-warning">
+                <i class="fas fa-star" [class.far]="i > (application.rating || 0)"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="card shadow-sm mb-4" *ngIf="application.activityLog && application.activityLog.length > 0">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Activity Timeline</h5>
+            <div class="timeline">
+              <div class="timeline-item" *ngFor="let entry of application.activityLog">
+                <div class="timeline-marker active"></div>
+                <div class="timeline-content">
+                  <h6>{{ entry.action }}</h6>
+                  <p class="text-muted small mb-0" *ngIf="entry.description">{{ entry.description }}</p>
+                  <p class="text-muted small mb-0" *ngIf="entry.timestamp">
+                    {{ entry.timestamp | date: 'MMM d, y, h:mm a' }}
+                    <span *ngIf="entry.userName"> by {{ entry.userName }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Quick Actions</h5>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-primary btn-sm" (click)="openStageModal()">
+                <i class="fas fa-arrow-right me-1"></i>Move to Stage
+              </button>
+              <button class="btn btn-outline-info btn-sm" (click)="openAssignModal()">
+                <i class="fas fa-user-plus me-1"></i>Assign Reviewer
+              </button>
+              <button class="btn btn-outline-success btn-sm" (click)="openOfferModal()" *ngIf="application.status !== 4 && application.status !== 5">
+                <i class="fas fa-handshake me-1"></i>Make Offer
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="openRejectModal()" *ngIf="application.status !== 6">
+                <i class="fas fa-times me-1"></i>Reject Application
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" (click)="openNotesModal()">
+                <i class="fas fa-sticky-note me-1"></i>Add Notes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Change -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Change Status</h5>
+            <select class="form-select" [value]="application.status" (change)="updateStatus(+$any($event.target).value)">
+              <option *ngFor="let opt of getStatusOptions()" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Interview Information -->
+        <div class="card shadow-sm mb-4" *ngIf="application.interviewDate">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="fas fa-calendar-alt text-primary me-2"></i>Interview Scheduled
+            </h5>
+            <div class="mb-2">
+              <label class="text-muted small">Date & Time</label>
+              <p class="mb-0">{{ application.interviewDate | date: 'MMMM d, y, h:mm a' }}</p>
+            </div>
+            <div *ngIf="application.interviewLocation">
+              <label class="text-muted small">Location</label>
+              <p class="mb-0">{{ application.interviewLocation }}</p>
+            </div>
+            <div *ngIf="application.interviewNotes" class="mt-2">
+              <label class="text-muted small">Notes</label>
+              <p class="mb-0 small">{{ application.interviewNotes }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offer Information -->
+        <div class="card shadow-sm mb-4 border-success" *ngIf="application.offerDate">
+          <div class="card-body">
+            <h5 class="card-title text-success mb-3">
+              <i class="fas fa-trophy me-2"></i>Job Offer
+            </h5>
+            <div class="mb-2" *ngIf="application.offeredSalary">
+              <label class="text-muted small">Offered Salary</label>
+              <p class="mb-0 h5">{{ application.offeredSalary | currency }}</p>
+            </div>
+            <div class="mb-2">
+              <label class="text-muted small">Offer Date</label>
+              <p class="mb-0">{{ application.offerDate | date: 'MMMM d, y' }}</p>
+            </div>
+            <div *ngIf="application.offerExpiryDate">
+              <label class="text-muted small">Offer Expires</label>
+              <p class="mb-0">{{ application.offerExpiryDate | date: 'MMMM d, y' }}</p>
+            </div>
+            <div *ngIf="application.offerAccepted !== undefined" class="mt-2">
+              <span class="badge" [ngClass]="application.offerAccepted ? 'bg-success' : 'bg-danger'">
+                {{ application.offerAccepted ? 'Accepted' : 'Declined' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rejection Information -->
+        <div class="card shadow-sm mb-4 border-danger" *ngIf="application.rejectionReason">
+          <div class="card-body">
+            <h5 class="card-title text-danger mb-3">
+              <i class="fas fa-times-circle me-2"></i>Rejected
+            </h5>
+            <div class="mb-2">
+              <label class="text-muted small">Reason</label>
+              <p class="mb-0">{{ application.rejectionReason }}</p>
+            </div>
+            <div *ngIf="application.rejectedDate">
+              <label class="text-muted small">Rejected Date</label>
+              <p class="mb-0">{{ application.rejectedDate | date: 'MMMM d, y' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !application" class="text-center py-5">
+    <div class="alert alert-danger">
+      Application not found or you don't have permission to view it.
+    </div>
+    <a routerLink="/applications" class="btn btn-primary">Back to Applications</a>
+  </div>
+
+  <!-- Modals -->
+  <!-- Move Stage Modal -->
+  <div class="modal fade" [class.show]="showStageModal" [style.display]="showStageModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Move to Stage</h5>
+          <button type="button" class="btn-close" (click)="closeModals()"></button>
+        </div>
+        <form [formGroup]="stageForm" (ngSubmit)="moveToStage()">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label required">New Stage</label>
+              <select class="form-select" formControlName="newStage">
+                <option *ngFor="let opt of stageOptions" [value]="opt.value">{{ opt.label }}</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" formControlName="notes" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="stageForm.invalid || saving">
+              <span *ngIf="!saving">Move</span>
+              <span *ngIf="saving">Moving...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Modal -->
+  <div class="modal fade" [class.show]="showRejectModal" [style.display]="showRejectModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reject Application</h5>
+          <button type="button" class="btn-close" (click)="closeModals()"></button>
+        </div>
+        <form [formGroup]="rejectForm" (ngSubmit)="rejectApplication()">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label required">Rejection Reason</label>
+              <textarea class="form-control" formControlName="rejectionReason" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" formControlName="sendNotification" id="sendNotification">
+                <label class="form-check-label" for="sendNotification">
+                  Send notification email to candidate
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+            <button type="submit" class="btn btn-danger" [disabled]="rejectForm.invalid || saving">
+              <span *ngIf="!saving">Reject</span>
+              <span *ngIf="saving">Rejecting...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offer Modal -->
+  <div class="modal fade" [class.show]="showOfferModal" [style.display]="showOfferModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Make Offer</h5>
+          <button type="button" class="btn-close" (click)="closeModals()"></button>
+        </div>
+        <form [formGroup]="offerForm" (ngSubmit)="makeOffer()">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label required">Offered Salary</label>
+              <input type="number" class="form-control" formControlName="offeredSalary" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required">Offer Expiry Date</label>
+              <input type="date" class="form-control" formControlName="offerExpiryDate" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Offer Details</label>
+              <textarea class="form-control" formControlName="offerDetails" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="offerForm.invalid || saving">
+              <span *ngIf="!saving">Make Offer</span>
+              <span *ngIf="saving">Creating...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Modal -->
+  <div class="modal fade" [class.show]="showAssignModal" [style.display]="showAssignModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Assign Reviewer</h5>
+          <button type="button" class="btn-close" (click)="closeModals()"></button>
+        </div>
+        <form [formGroup]="assignForm" (ngSubmit)="assignReviewer()">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label required">Reviewer ID</label>
+              <input type="text" class="form-control" formControlName="reviewerId" required>
+              <small class="text-muted">Enter the user ID of the reviewer</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required">Reviewer Name</label>
+              <input type="text" class="form-control" formControlName="reviewerName" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="assignForm.invalid || saving">
+              <span *ngIf="!saving">Assign</span>
+              <span *ngIf="saving">Assigning...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes Modal -->
+  <div class="modal fade" [class.show]="showNotesModal" [style.display]="showNotesModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Review Notes</h5>
+          <button type="button" class="btn-close" (click)="closeModals()"></button>
+        </div>
+        <form [formGroup]="notesForm" (ngSubmit)="saveNotes()">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Review Notes</label>
+              <textarea class="form-control" formControlName="reviewNotes" rows="5"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Rating (1-5)</label>
+              <input type="number" class="form-control" formControlName="rating" min="1" max="5">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="saving">
+              <span *ngIf="!saving">Save</span>
+              <span *ngIf="saving">Saving...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade" [class.show]="showStageModal || showRejectModal || showOfferModal || showAssignModal || showNotesModal" *ngIf="showStageModal || showRejectModal || showOfferModal || showAssignModal || showNotesModal"></div>
+</div>
+

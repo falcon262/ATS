@@ -1,0 +1,173 @@
+<div class="container-fluid py-4">
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="!loading && job">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/jobs">Jobs</a></li>
+            <li class="breadcrumb-item active">{{ job.title }}</li>
+          </ol>
+        </nav>
+        <h1 class="h2 mb-2">{{ job.title }}</h1>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span [ngClass]="getStatusClass(job.status)">
+            {{ getStatusText(job.status) }}
+          </span>
+          <span class="badge bg-light text-dark">
+            <i class="fas fa-building me-1"></i> {{ job.departmentName || 'N/A' }}
+          </span>
+          <span class="badge bg-light text-dark">
+            <i class="fas fa-map-marker-alt me-1"></i> {{ job.location || 'N/A' }}
+          </span>
+          <span class="badge bg-light text-dark" *ngIf="job.isRemote">
+            <i class="fas fa-laptop-house me-1"></i> Remote
+          </span>
+        </div>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-outline-primary me-2" [routerLink]="['/jobs', jobId, 'edit']">
+          <i class="fas fa-edit me-2"></i> Edit Job
+        </button>
+        <button class="btn btn-primary" routerLink="/applications/new" [queryParams]="{jobId: jobId}">
+          <i class="fas fa-plus me-2"></i> Add Application
+        </button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Main Content -->
+      <div class="col-12 col-lg-8">
+        <!-- Description -->
+        <div class="form-section">
+          <h4 class="section-title">Job Description</h4>
+          <div [innerHTML]="job.description || 'No description available'"></div>
+        </div>
+
+        <!-- Requirements -->
+        <div class="form-section">
+          <h4 class="section-title">Requirements</h4>
+          <div [innerHTML]="job.requirements || 'No requirements specified'"></div>
+        </div>
+
+        <!-- Responsibilities -->
+        <div class="form-section" *ngIf="job.responsibilities">
+          <h4 class="section-title">Responsibilities</h4>
+          <div [innerHTML]="job.responsibilities"></div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="form-section" *ngIf="job.benefits">
+          <h4 class="section-title">Benefits</h4>
+          <div [innerHTML]="job.benefits"></div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-12 col-lg-4">
+        <!-- Job Details -->
+        <div class="form-section">
+          <h4 class="section-title">Job Details</h4>
+          <dl class="row mb-0">
+            <dt class="col-sm-6 mb-2">Employment Type</dt>
+            <dd class="col-sm-6 mb-2">{{ getEmploymentTypeText(job.employmentType) }}</dd>
+
+            <dt class="col-sm-6 mb-2">Experience Level</dt>
+            <dd class="col-sm-6 mb-2">{{ getExperienceLevelText(job.experienceLevel) }}</dd>
+
+            <dt class="col-sm-6 mb-2" *ngIf="job.minSalary">Salary Range</dt>
+            <dd class="col-sm-6 mb-2" *ngIf="job.minSalary">
+              ${{ job.minSalary | number }} - ${{ job.maxSalary | number }}
+            </dd>
+
+            <dt class="col-sm-6 mb-2">Posted Date</dt>
+            <dd class="col-sm-6 mb-2">{{ job.postedDate | date: 'MMM d, y' }}</dd>
+
+            <dt class="col-sm-6 mb-2" *ngIf="job.closingDate">Application Deadline</dt>
+            <dd class="col-sm-6 mb-2" *ngIf="job.closingDate">{{ job.closingDate | date: 'MMM d, y' }}</dd>
+
+            <dt class="col-sm-6 mb-2">Applications</dt>
+            <dd class="col-sm-6 mb-2">{{ job.applicationCount || 0 }}</dd>
+
+            <dt class="col-sm-6 mb-2">Views</dt>
+            <dd class="col-sm-6 mb-2">{{ job.viewCount || 0 }}</dd>
+          </dl>
+        </div>
+
+        <!-- Skills Required -->
+        <div class="form-section" *ngIf="job.requiredSkills && job.requiredSkills.length > 0">
+          <h4 class="section-title">Required Skills</h4>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-primary" *ngFor="let skill of job.requiredSkills">
+              {{ skill }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Hiring Manager -->
+        <div class="form-section" *ngIf="job.hiringManagerId">
+          <h4 class="section-title">Hiring Manager</h4>
+          <p class="mb-0">{{ job.hiringManagerName || 'N/A' }}</p>
+        </div>
+
+        <!-- Public Application Link -->
+        <div class="form-section" *ngIf="publicUrl">
+          <h4 class="section-title">
+            <i class="fas fa-link me-2"></i>Public Application Link
+          </h4>
+          <p class="text-muted small mb-2">Share this link with candidates to apply directly</p>
+          <div class="input-group mb-2">
+            <input type="text" class="form-control" [value]="publicUrl" readonly>
+            <button class="btn btn-outline-primary" type="button" (click)="copyPublicLink()">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <button class="btn btn-sm btn-outline-success w-100" (click)="copyPublicLink()">
+            <i class="fas fa-clipboard me-2"></i> Copy Link
+          </button>
+        </div>
+
+        <!-- Job Status Actions -->
+        <div class="form-section" *ngIf="canPublish() || canClose()">
+          <h4 class="section-title">Job Status</h4>
+          <div class="d-grid gap-2">
+            <button class="btn btn-success" *ngIf="canPublish()" (click)="publishJob()" [disabled]="loading">
+              <i class="fas fa-check-circle me-2"></i> Publish Job
+            </button>
+            <button class="btn btn-warning" *ngIf="canClose()" (click)="closeJob()" [disabled]="loading">
+              <i class="fas fa-times-circle me-2"></i> Close Job
+            </button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-section">
+          <h4 class="section-title">Actions</h4>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary" [routerLink]="['/applications']" [queryParams]="{jobId: jobId}">
+              <i class="fas fa-users me-2"></i> View Applications
+            </button>
+            <button class="btn btn-outline-primary" [routerLink]="['/pipeline']" [queryParams]="{jobId: jobId}">
+              <i class="fas fa-tasks me-2"></i> View in Pipeline
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !job" class="empty-state">
+    <div class="empty-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <div class="empty-title">Job Not Found</div>
+    <div class="empty-message">The requested job could not be found</div>
+    <button class="btn btn-primary mt-3" routerLink="/jobs">
+      <i class="fas fa-arrow-left me-2"></i> Back to Jobs
+    </button>
+  </div>
+</div>

@@ -1,0 +1,82 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="h2 mb-1">Job Openings</h1>
+      <p class="text-muted">Manage all job positions</p>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-gradient" routerLink="/jobs/new">
+        <i class="fas fa-plus me-2"></i> Post New Job
+      </button>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="data-table-container mb-4">
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search jobs by title, department, or location..."
+            [(ngModel)]="searchFilter"
+            (keyup.enter)="onSearch()">
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <button class="btn btn-primary" (click)="onSearch()">
+          <i class="fas fa-search me-2"></i> Search
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && jobs.length === 0" class="empty-state">
+    <div class="empty-icon">
+      <i class="fas fa-briefcase"></i>
+    </div>
+    <div class="empty-title">No Jobs Found</div>
+    <div class="empty-message">
+      {{ searchFilter ? 'Try adjusting your search criteria' : 'Start by posting your first job opening' }}
+    </div>
+    <button *ngIf="!searchFilter" class="btn btn-gradient mt-3" routerLink="/jobs/new">
+      <i class="fas fa-plus me-2"></i> Post New Job
+    </button>
+  </div>
+
+  <!-- Jobs Grid -->
+  <div *ngIf="!loading && jobs.length > 0">
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-lg-4" *ngFor="let job of jobs">
+        <app-job-card [job]="job" (refresh)="loadJobs()"></app-job-card>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4" *ngIf="totalPages > 1">
+      <nav>
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
+          </li>
+          <li class="page-item" *ngFor="let page of pages" [class.active]="currentPage === page">
+            <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

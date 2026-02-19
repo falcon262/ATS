@@ -1,0 +1,255 @@
+<div class="container-fluid py-4">
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && candidate">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/candidates">Candidates</a></li>
+            <li class="breadcrumb-item active">{{ candidate.firstName }} {{ candidate.lastName }}</li>
+          </ol>
+        </nav>
+        <h1 class="h2 mb-2">{{ candidate.firstName }} {{ candidate.lastName }}</h1>
+        <p class="text-muted mb-0" *ngIf="candidate.currentJobTitle || candidate.currentCompany">
+          <i class="fas fa-briefcase me-2"></i>
+          <span *ngIf="candidate.currentJobTitle">{{ candidate.currentJobTitle }}</span>
+          <span *ngIf="candidate.currentJobTitle && candidate.currentCompany"> at </span>
+          <span *ngIf="candidate.currentCompany">{{ candidate.currentCompany }}</span>
+          <span *ngIf="candidate.yearsOfExperience"> • {{ candidate.yearsOfExperience }} years exp.</span>
+        </p>
+        <p class="text-muted" *ngIf="candidate.city || candidate.state || candidate.country">
+          <i class="fas fa-map-marker-alt me-2"></i>
+          {{ getLocation() }}
+        </p>
+      </div>
+      <div class="col-auto" *ngIf="candidate.resumeUrl">
+        <button class="btn btn-primary" (click)="downloadResume()" [disabled]="downloadingResume">
+          <i class="fas fa-download me-2"></i>
+          {{ downloadingResume ? 'Downloading...' : 'Download Resume' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Left Column -->
+      <div class="col-12 col-lg-8">
+        <!-- Contact Information -->
+        <div class="form-section">
+          <h4 class="section-title">Contact Information</h4>
+          <dl class="row mb-0">
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">
+              <a [href]="'mailto:' + candidate.email">{{ candidate.email }}</a>
+            </dd>
+            <dt class="col-sm-3">Phone</dt>
+            <dd class="col-sm-9">
+              <a [href]="'tel:' + candidate.phoneNumber" *ngIf="candidate.phoneNumber">{{ candidate.phoneNumber }}</a>
+              <span *ngIf="!candidate.phoneNumber">N/A</span>
+            </dd>
+            <dt class="col-sm-3" *ngIf="candidate.alternatePhone">Alt. Phone</dt>
+            <dd class="col-sm-9" *ngIf="candidate.alternatePhone">
+              <a [href]="'tel:' + candidate.alternatePhone">{{ candidate.alternatePhone }}</a>
+            </dd>
+          </dl>
+        </div>
+
+        <!-- Links -->
+        <div class="form-section" *ngIf="candidate.linkedInUrl || candidate.gitHubUrl || candidate.portfolioUrl || candidate.personalWebsite">
+          <h4 class="section-title">Links</h4>
+          <div class="d-flex flex-wrap gap-3">
+            <a *ngIf="candidate.linkedInUrl" [href]="candidate.linkedInUrl" target="_blank" class="btn btn-outline-primary btn-sm">
+              <i class="fab fa-linkedin me-2"></i>LinkedIn
+            </a>
+            <a *ngIf="candidate.gitHubUrl" [href]="candidate.gitHubUrl" target="_blank" class="btn btn-outline-dark btn-sm">
+              <i class="fab fa-github me-2"></i>GitHub
+            </a>
+            <a *ngIf="candidate.portfolioUrl" [href]="candidate.portfolioUrl" target="_blank" class="btn btn-outline-secondary btn-sm">
+              <i class="fas fa-folder me-2"></i>Portfolio
+            </a>
+            <a *ngIf="candidate.personalWebsite" [href]="candidate.personalWebsite" target="_blank" class="btn btn-outline-info btn-sm">
+              <i class="fas fa-globe me-2"></i>Website
+            </a>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="form-section" *ngIf="candidate.experience && candidate.experience.length > 0">
+          <h4 class="section-title">Professional Experience</h4>
+          <div *ngFor="let exp of candidate.experience; let last = last" [class.mb-3]="!last">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <div>
+                <h6 class="mb-0">{{ exp.jobTitle || 'Professional Experience' }}</h6>
+                <p class="text-muted mb-1" *ngIf="exp.company">{{ exp.company }}</p>
+              </div>
+              <small class="text-muted" *ngIf="exp.startDate">
+                {{ formatDate(exp.startDate) }} - {{ exp.isCurrent ? 'Present' : formatDate(exp.endDate) }}
+              </small>
+            </div>
+            <p class="mb-0" *ngIf="exp.description">{{ exp.description }}</p>
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="form-section" *ngIf="candidate.education && candidate.education.length > 0">
+          <h4 class="section-title">Education</h4>
+          <div *ngFor="let edu of candidate.education; let last = last" [class.mb-3]="!last">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <div>
+                <h6 class="mb-0">{{ edu.degree || 'Education' }}</h6>
+                <p class="text-muted mb-0" *ngIf="edu.institution">{{ edu.institution }}</p>
+                <p class="text-muted mb-0" *ngIf="edu.fieldOfStudy">{{ edu.fieldOfStudy }}</p>
+              </div>
+              <small class="text-muted" *ngIf="edu.graduationYear">{{ edu.graduationYear }}</small>
+            </div>
+            <p class="mb-0" *ngIf="edu.grade"><strong>Grade:</strong> {{ edu.grade }}</p>
+          </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="form-section" *ngIf="candidate.skills && candidate.skills.length > 0">
+          <h4 class="section-title">Skills</h4>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-primary" *ngFor="let skill of candidate.skills">{{ skill }}</span>
+          </div>
+        </div>
+
+        <!-- Certifications -->
+        <div class="form-section" *ngIf="candidate.certifications && candidate.certifications.length > 0">
+          <h4 class="section-title">Certifications</h4>
+          <ul class="list-unstyled mb-0">
+            <li *ngFor="let cert of candidate.certifications" class="mb-1">
+              <i class="fas fa-certificate text-success me-2"></i>{{ cert }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-section" *ngIf="candidate.notes">
+          <h4 class="section-title">Notes</h4>
+          <p class="mb-0">{{ candidate.notes }}</p>
+        </div>
+      </div>
+
+      <!-- Applications Section -->
+      <div class="col-12">
+        <div class="form-section">
+          <h4 class="section-title">Applications</h4>
+          <div *ngIf="loadingApplications" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <div *ngIf="!loadingApplications && applications.length === 0" class="text-muted py-3">
+            <p class="mb-0">No applications found for this candidate.</p>
+          </div>
+          <div *ngIf="!loadingApplications && applications.length > 0" class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Job Title</th>
+                  <th>Applied Date</th>
+                  <th>Status</th>
+                  <th>Stage</th>
+                  <th>AI Score</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let app of applications">
+                  <td>
+                    <strong>{{ app.jobTitle }}</strong>
+                  </td>
+                  <td>{{ app.appliedDate | date: 'MMM d, y' }}</td>
+                  <td>
+                    <span [class]="getStatusBadgeClass(app.status!)">
+                      {{ getStatusText(app.status!) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge bg-secondary">{{ getStageText(app.stage!) }}</span>
+                  </td>
+                  <td>
+                    <span *ngIf="app.aiScore" [ngClass]="getApplicationScoreClass(app.aiScore)">
+                      <strong>{{ app.aiScore | number: '1.0-0' }}%</strong>
+                    </span>
+                    <span *ngIf="!app.aiScore" class="text-muted">-</span>
+                  </td>
+                  <td>
+                    <a [routerLink]="['/applications', app.id]" class="btn btn-sm btn-outline-primary">
+                      <i class="fas fa-eye me-1"></i>View
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Right Column -->
+      <div class="col-12 col-lg-4">
+        <!-- Status -->
+        <div class="form-section">
+          <h4 class="section-title">Status</h4>
+          <span [class]="getCandidateStatusBadgeClass()">{{ getCandidateStatusText() }}</span>
+        </div>
+
+        <!-- Work Preferences -->
+        <div class="form-section">
+          <h4 class="section-title">Work Preferences</h4>
+          <dl class="row mb-0 small">
+            <dt class="col-6">Remote Work</dt>
+            <dd class="col-6">
+              <span *ngIf="candidate.isOpenToRemote" class="text-success">
+                <i class="fas fa-check-circle"></i> Yes
+              </span>
+              <span *ngIf="!candidate.isOpenToRemote" class="text-muted">
+                <i class="fas fa-times-circle"></i> No
+              </span>
+            </dd>
+            <dt class="col-6">Relocation</dt>
+            <dd class="col-6">
+              <span *ngIf="candidate.isWillingToRelocate" class="text-success">
+                <i class="fas fa-check-circle"></i> Yes
+              </span>
+              <span *ngIf="!candidate.isWillingToRelocate" class="text-muted">
+                <i class="fas fa-times-circle"></i> No
+              </span>
+            </dd>
+            <dt class="col-6" *ngIf="candidate.expectedSalary">Expected Salary</dt>
+            <dd class="col-6" *ngIf="candidate.expectedSalary">
+              {{ candidate.expectedSalary | number }} {{ candidate.preferredCurrency }}
+            </dd>
+            <dt class="col-6" *ngIf="candidate.availableFrom">Available From</dt>
+            <dd class="col-6" *ngIf="candidate.availableFrom">
+              {{ formatDate(candidate.availableFrom) }}
+            </dd>
+            <dt class="col-6" *ngIf="candidate.noticePeriod">Notice Period</dt>
+            <dd class="col-6" *ngIf="candidate.noticePeriod">
+              {{ candidate.noticePeriod }}
+            </dd>
+          </dl>
+        </div>
+
+        <!-- Source -->
+        <div class="form-section" *ngIf="candidate.source || candidate.referredBy">
+          <h4 class="section-title">Source</h4>
+          <p class="mb-1" *ngIf="candidate.source"><strong>Source:</strong> {{ candidate.source }}</p>
+          <p class="mb-0" *ngIf="candidate.referredBy"><strong>Referred By:</strong> {{ candidate.referredBy }}</p>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-section" *ngIf="candidate.tags && candidate.tags.length > 0">
+          <h4 class="section-title">Tags</h4>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-secondary" *ngFor="let tag of candidate.tags">{{ tag }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,182 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a routerLink="/jobs">Jobs</a></li>
+          <li class="breadcrumb-item active">{{ isEditMode ? 'Edit Job' : 'New Job' }}</li>
+        </ol>
+      </nav>
+      <h1 class="h2">{{ isEditMode ? 'Edit Job' : 'Post New Job' }}</h1>
+    </div>
+  </div>
+
+  <form [formGroup]="jobForm" (ngSubmit)="onSubmit()">
+    <div class="row g-4">
+      <div class="col-12 col-lg-8">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h4 class="section-title">Basic Information</h4>
+
+          <div class="mb-3">
+            <label class="form-label required">Job Title</label>
+            <input type="text" class="form-control" formControlName="title" placeholder="e.g. Senior Software Engineer">
+            <div class="text-danger small mt-1" *ngIf="jobForm.get('title')?.touched && jobForm.get('title')?.errors">
+              Job title is required
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label required">Department</label>
+              <select class="form-select" formControlName="departmentId" [disabled]="loadingDepartments">
+                <option value="">{{ loadingDepartments ? 'Loading departments...' : 'Select a department' }}</option>
+                <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.name }}</option>
+              </select>
+              <div class="text-danger small mt-1" *ngIf="jobForm.get('departmentId')?.touched && jobForm.get('departmentId')?.errors">
+                Department is required
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label required">Location</label>
+              <input type="text" class="form-control" formControlName="location" placeholder="e.g. San Francisco, CA">
+              <div class="text-danger small mt-1" *ngIf="jobForm.get('location')?.touched && jobForm.get('location')?.errors">
+                Location is required
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" formControlName="isRemote" id="isRemote">
+              <label class="form-check-label" for="isRemote">
+                Remote Position
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label required" for="employmentType">Employment Type</label>
+              <select class="form-select" formControlName="employmentType" id="employmentType">
+                <option [value]="type.value" *ngFor="let type of employmentTypes">{{ type.label }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label required" for="experienceLevel">Experience Level</label>
+              <select class="form-select" formControlName="experienceLevel" id="experienceLevel">
+                <option [value]="level.value" *ngFor="let level of experienceLevels">{{ level.label }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="form-section">
+          <h4 class="section-title">Job Description</h4>
+
+          <div class="mb-3">
+            <label class="form-label required">Description</label>
+            <textarea class="form-control" formControlName="description" rows="6"
+              placeholder="Provide a detailed description of the job..."></textarea>
+            <div class="text-danger small mt-1" *ngIf="jobForm.get('description')?.touched && jobForm.get('description')?.errors">
+              Description is required
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label required">Requirements</label>
+            <textarea class="form-control" formControlName="requirements" rows="6" maxlength="1000"
+              placeholder="List the requirements for this position..."></textarea>
+            <small class="form-text text-muted">{{ jobForm.get('requirements')?.value?.length || 0 }}/1000 characters</small>
+            <div class="text-danger small mt-1" *ngIf="jobForm.get('requirements')?.touched && jobForm.get('requirements')?.errors">
+              Requirements are required
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Responsibilities</label>
+            <textarea class="form-control" formControlName="responsibilities" rows="6" maxlength="1000"
+              placeholder="Describe the key responsibilities..."></textarea>
+            <small class="form-text text-muted">{{ jobForm.get('responsibilities')?.value?.length || 0 }}/1000 characters</small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Benefits</label>
+            <textarea class="form-control" formControlName="benefits" rows="4"
+              placeholder="List benefits and perks..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <!-- Additional Details -->
+        <div class="form-section">
+          <h4 class="section-title">Additional Details</h4>
+
+          <div class="mb-3">
+            <label class="form-label">Salary Range</label>
+            <div class="input-group mb-2">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" formControlName="salaryRangeMin" placeholder="Min">
+            </div>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" formControlName="salaryRangeMax" placeholder="Max">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="applicationDeadline">Application Deadline</label>
+            <input type="date" class="form-control" formControlName="applicationDeadline" id="applicationDeadline">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Required Skills</label>
+            <input type="text" class="form-control" formControlName="requiredSkills"
+              placeholder="e.g. JavaScript, React, Node.js (comma-separated)">
+            <small class="form-text text-muted">Separate skills with commas</small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Hiring Manager ID</label>
+            <input type="text" class="form-control" formControlName="hiringManagerId"
+              placeholder="Optional">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Hiring Manager Name</label>
+            <input type="text" class="form-control" formControlName="hiringManagerName" maxlength="100"
+              placeholder="e.g. John Doe">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Hiring Manager Email</label>
+            <input type="email" class="form-control" formControlName="hiringManagerEmail" maxlength="100"
+              placeholder="e.g. john.doe@company.com">
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-section">
+          <h4 class="section-title">Actions</h4>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-gradient" [disabled]="loading">
+              <span *ngIf="!loading">
+                <i class="fas fa-save me-2"></i> {{ isEditMode ? 'Update Job' : 'Create Job' }}
+              </span>
+              <span *ngIf="loading">
+                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+              </span>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="cancel()" [disabled]="loading">
+              <i class="fas fa-times me-2"></i> Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,312 @@
+/* 
+ * TalentFlow ATS Brand Color System
+ * Based on official brand guidelines
+ */
+
+:root {
+  /* ========================================
+   * PRIMARY BRAND COLORS
+   * ======================================== */
+  
+  /* Orange - Primary Brand Color */
+  --brand-orange: #FD5108;
+  --brand-orange-rgb: 253, 81, 8;
+  --brand-orange-light: #ff7a3d;
+  --brand-orange-lighter: #ffa573;
+  --brand-orange-lightest: #ffd0a9;
+  --brand-orange-dark: #d44507;
+  --brand-orange-darker: #ab3906;
+  
+  /* White - Backgrounds & Text */
+  --brand-white: #FFFFFF;
+  --brand-white-rgb: 255, 255, 255;
+  
+  /* Black - Text & Data Visualizations */
+  --brand-black: #000000;
+  --brand-black-rgb: 0, 0, 0;
+  --brand-black-light: #1a1a1a;
+  --brand-black-lighter: #333333;
+  
+  /* ========================================
+   * FUNCTIONAL COLORS (Derived from brand)
+   * ======================================== */
+  
+  /* Primary - Orange for CTAs, momentum marks */
+  --primary: var(--brand-orange);
+  --primary-rgb: var(--brand-orange-rgb);
+  --primary-hover: var(--brand-orange-dark);
+  --primary-active: var(--brand-orange-darker);
+  --primary-light: var(--brand-orange-light);
+  
+  /* Success - Green (complementary to orange) */
+  --success: #10b981;
+  --success-rgb: 16, 185, 129;
+  --success-light: rgba(16, 185, 129, 0.1);
+  
+  /* Warning - Amber (harmonious with orange) */
+  --warning: #f59e0b;
+  --warning-rgb: 245, 158, 11;
+  --warning-light: rgba(245, 158, 11, 0.1);
+  
+  /* Danger - Red (complementary palette) */
+  --danger: #ef4444;
+  --danger-rgb: 239, 68, 68;
+  --danger-light: rgba(239, 68, 68, 0.1);
+  
+  /* Info - Blue (complementary to orange) */
+  --info: #3b82f6;
+  --info-rgb: 59, 130, 246;
+  --info-light: rgba(59, 130, 246, 0.1);
+  
+  /* ========================================
+   * NEUTRAL COLORS (Black-based grays)
+   * ======================================== */
+  
+  /* Dark - For primary text */
+  --dark: var(--brand-black);
+  --dark-rgb: var(--brand-black-rgb);
+  
+  /* Gray Scale - Black-based neutrals */
+  --gray-900: #1a1a1a;
+  --gray-800: #333333;
+  --gray-700: #4d4d4d;
+  --gray-600: #666666;
+  --gray-500: #808080;
+  --gray-400: #999999;
+  --gray-300: #b3b3b3;
+  --gray-200: #cccccc;
+  --gray-100: #e6e6e6;
+  --gray-50: #f5f5f5;
+  
+  --gray: var(--gray-600);
+  --gray-light: var(--gray-300);
+  --gray-lighter: var(--gray-100);
+  
+  /* Light backgrounds */
+  --light: var(--gray-50);
+  --light-rgb: 245, 245, 245;
+  
+  /* White */
+  --white: var(--brand-white);
+  --white-rgb: var(--brand-white-rgb);
+  
+  /* ========================================
+   * GRADIENTS
+   * ======================================== */
+  
+  /* Tangerine to Orange - For pictograms */
+  --gradient-primary: linear-gradient(135deg, #ff9966 0%, #FD5108 100%);
+  --gradient-primary-reverse: linear-gradient(135deg, #FD5108 0%, #ff9966 100%);
+  
+  /* Orange variations */
+  --gradient-orange-light: linear-gradient(135deg, #ffa573 0%, #ff7a3d 100%);
+  --gradient-orange-dark: linear-gradient(135deg, #FD5108 0%, #d44507 100%);
+  
+  /* Subtle background gradients */
+  --gradient-subtle: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  
+  /* ========================================
+   * SHADOWS & OVERLAYS
+   * ======================================== */
+  
+  /* Shadows - Black-based with appropriate opacity */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
+  --shadow-2xl: 0 20px 40px rgba(0, 0, 0, 0.2);
+  
+  /* Orange shadows for CTAs */
+  --shadow-orange: 0 4px 12px rgba(253, 81, 8, 0.3);
+  --shadow-orange-lg: 0 8px 20px rgba(253, 81, 8, 0.4);
+  
+  /* Overlays */
+  --overlay-light: rgba(255, 255, 255, 0.9);
+  --overlay-dark: rgba(0, 0, 0, 0.5);
+  --overlay-darker: rgba(0, 0, 0, 0.7);
+  
+  /* ========================================
+   * SEMANTIC COLOR APPLICATIONS
+   * ======================================== */
+  
+  /* Text colors */
+  --text-primary: var(--brand-black);
+  --text-secondary: var(--gray-600);
+  --text-muted: var(--gray-500);
+  --text-disabled: var(--gray-400);
+  --text-inverse: var(--brand-white);
+  --text-link: var(--brand-orange);
+  --text-link-hover: var(--brand-orange-dark);
+  
+  /* Background colors */
+  --bg-primary: var(--brand-white);
+  --bg-secondary: var(--gray-50);
+  --bg-tertiary: var(--gray-100);
+  --bg-inverse: var(--brand-black);
+  --bg-overlay: var(--overlay-dark);
+  
+  /* Border colors */
+  --border-light: var(--gray-200);
+  --border-medium: var(--gray-300);
+  --border-dark: var(--gray-400);
+  --border-primary: var(--brand-orange);
+  
+  /* Interactive states */
+  --hover-bg: var(--gray-50);
+  --active-bg: var(--gray-100);
+  --focus-ring: rgba(253, 81, 8, 0.3);
+  
+  /* ========================================
+   * AI SCORE COLORS
+   * ======================================== */
+  
+  /* High Score (80-100) - Success Green */
+  --ai-score-high: var(--success);
+  --ai-score-high-bg: var(--success-light);
+  --ai-score-high-border: var(--success);
+  
+  /* Medium Score (60-79) - Brand Orange */
+  --ai-score-medium: var(--brand-orange);
+  --ai-score-medium-bg: rgba(253, 81, 8, 0.1);
+  --ai-score-medium-border: var(--brand-orange);
+  
+  /* Low Score (0-59) - Danger Red */
+  --ai-score-low: var(--danger);
+  --ai-score-low-bg: var(--danger-light);
+  --ai-score-low-border: var(--danger);
+  
+  /* ========================================
+   * STATUS COLORS
+   * ======================================== */
+  
+  /* Active/Published */
+  --status-active: var(--success);
+  --status-active-bg: var(--success-light);
+  
+  /* Pending/In Progress */
+  --status-pending: var(--brand-orange);
+  --status-pending-bg: rgba(253, 81, 8, 0.1);
+  
+  /* Warning/Review */
+  --status-warning: var(--warning);
+  --status-warning-bg: var(--warning-light);
+  
+  /* Inactive/Closed */
+  --status-inactive: var(--gray-500);
+  --status-inactive-bg: rgba(128, 128, 128, 0.1);
+  
+  /* Rejected/Error */
+  --status-rejected: var(--danger);
+  --status-rejected-bg: var(--danger-light);
+  
+  /* ========================================
+   * CHART & DATA VISUALIZATION COLORS
+   * ======================================== */
+  
+  /* Primary palette - Black-based with orange accent */
+  --chart-primary: var(--brand-black);
+  --chart-secondary: var(--brand-orange);
+  --chart-tertiary: var(--gray-600);
+  --chart-quaternary: var(--gray-400);
+  
+  /* Multi-series charts */
+  --chart-series-1: var(--brand-orange);
+  --chart-series-2: var(--brand-black);
+  --chart-series-3: var(--gray-600);
+  --chart-series-4: var(--gray-400);
+  --chart-series-5: var(--brand-orange-light);
+  --chart-series-6: var(--gray-800);
+  
+  /* Chart backgrounds */
+  --chart-bg: var(--brand-white);
+  --chart-grid: var(--gray-200);
+  --chart-axis: var(--gray-400);
+  
+  /* ========================================
+   * ICON COLORS (UI/UX only)
+   * ======================================== */
+  
+  --icon-primary: var(--brand-black);
+  --icon-secondary: var(--gray-600);
+  --icon-accent: var(--brand-orange);
+  --icon-inverse: var(--brand-white);
+  --icon-success: var(--success);
+  --icon-warning: var(--warning);
+  --icon-danger: var(--danger);
+  
+  /* ========================================
+   * BUTTON COLORS
+   * ======================================== */
+  
+  /* Primary Button - Orange */
+  --btn-primary-bg: var(--brand-orange);
+  --btn-primary-text: var(--brand-white);
+  --btn-primary-hover: var(--brand-orange-dark);
+  --btn-primary-active: var(--brand-orange-darker);
+  --btn-primary-shadow: var(--shadow-orange);
+  
+  /* Secondary Button - Black outline */
+  --btn-secondary-bg: transparent;
+  --btn-secondary-text: var(--brand-black);
+  --btn-secondary-border: var(--brand-black);
+  --btn-secondary-hover-bg: var(--brand-black);
+  --btn-secondary-hover-text: var(--brand-white);
+  
+  /* Tertiary Button - Text only */
+  --btn-tertiary-text: var(--brand-orange);
+  --btn-tertiary-hover: var(--brand-orange-dark);
+  
+  /* Danger Button */
+  --btn-danger-bg: var(--danger);
+  --btn-danger-text: var(--brand-white);
+  --btn-danger-hover: #dc2626;
+  
+  /* ========================================
+   * CARD & CONTAINER COLORS
+   * ======================================== */
+  
+  --card-bg: var(--brand-white);
+  --card-border: var(--border-light);
+  --card-shadow: var(--shadow-sm);
+  --card-hover-shadow: var(--shadow-md);
+  
+  /* ========================================
+   * FORM COLORS
+   * ======================================== */
+  
+  --input-bg: var(--brand-white);
+  --input-border: var(--border-medium);
+  --input-border-focus: var(--brand-orange);
+  --input-text: var(--brand-black);
+  --input-placeholder: var(--gray-400);
+  --input-disabled-bg: var(--gray-100);
+  --input-disabled-text: var(--gray-400);
+  
+  /* ========================================
+   * TABLE COLORS
+   * ======================================== */
+  
+  --table-header-bg: var(--gray-50);
+  --table-header-text: var(--gray-700);
+  --table-border: var(--border-light);
+  --table-row-hover: var(--gray-50);
+  --table-row-selected: rgba(253, 81, 8, 0.05);
+}
+
+/* ========================================
+ * DARK MODE OVERRIDES (Future)
+ * ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode would invert to use white backgrounds with black text */
+    /* Keeping orange as the primary accent */
+    /* This section can be expanded when dark mode is implemented */
+  }
+}
+
+
+
+
+

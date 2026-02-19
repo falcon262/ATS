@@ -1,0 +1,60 @@
+<div class="data-table-container">
+  <div class="table-header">
+    <h3>Recent Applications</h3>
+    <a routerLink="/applications" class="btn btn-sm btn-outline-primary">View All</a>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="!loading && applications.length === 0" class="empty-state">
+    <div class="empty-icon">
+      <i class="fas fa-inbox"></i>
+    </div>
+    <div class="empty-title">No Applications Yet</div>
+    <div class="empty-message">Applications will appear here once candidates start applying</div>
+  </div>
+
+  <div *ngIf="!loading && applications.length > 0" class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Job Position</th>
+          <th>Applied Date</th>
+          <th>AI Score</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let app of applications">
+          <td>
+            <div class="d-flex align-items-center">
+              <div class="ms-2">
+                <div class="fw-semibold">{{ app.candidateName || 'Unknown' }}</div>
+                <small class="text-muted">{{ app.candidateEmail || '' }}</small>
+              </div>
+            </div>
+          </td>
+          <td>{{ app.jobTitle || 'N/A' }}</td>
+          <td>{{ app.appliedDate | date: 'MMM d, y' }}</td>
+          <td>
+            <span [ngClass]="getAIScoreClass(app.aiScore || 0)">
+              {{ app.aiScore || 0 }}%
+            </span>
+          </td>
+          <td>
+            <span [ngClass]="getStatusClass(app.status)">{{ app.status }}</span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary" [routerLink]="['/candidates', app.candidateId]">
+              <i class="fas fa-eye"></i> View
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

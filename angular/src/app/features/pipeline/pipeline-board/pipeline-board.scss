@@ -1,0 +1,142 @@
+.pipeline-board {
+  min-height: 600px;
+}
+
+.pipeline-column {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+}
+
+.pipeline-column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #dee2e6;
+
+  h6 {
+    font-weight: 600;
+    color: #495057;
+  }
+}
+
+.pipeline-column-content {
+  flex: 1;
+  min-height: 400px;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.pipeline-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: move;
+  position: relative;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.pipeline-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+
+  strong {
+    font-size: 0.9rem;
+    color: #212529;
+    flex: 1;
+  }
+
+  .badge-sm {
+    font-size: 0.65rem;
+    padding: 0.25em 0.5em;
+  }
+}
+
+.pipeline-card-body {
+  .pipeline-card-job {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+  }
+
+  .pipeline-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+  }
+
+  .pipeline-card-score {
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+}
+
+.cdk-drag-handle {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #adb5bd;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.pipeline-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #adb5bd;
+
+  i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// CDK Drag Drop Styles
+.cdk-drop-list-dragging .pipeline-card:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.4;
+  background: #e9ecef;
+  border: 2px dashed #adb5bd;
+}
+
+.cdk-drag-preview {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: rotate(2deg);
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .pipeline-column {
+    min-height: 300px;
+  }
+
+  .pipeline-column-content {
+    min-height: 250px;
+  }
+}
+

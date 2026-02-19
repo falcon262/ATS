@@ -1,0 +1,145 @@
+// Responsive Design Utilities for TalentFlow ATS
+@use "sass:map";
+
+// Breakpoints
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+// Responsive mixins
+@mixin respond-to($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+}
+
+// Mobile-first responsive utilities
+.stat-card {
+  margin-bottom: 1rem;
+
+  @include respond-to(md) {
+    margin-bottom: 0;
+  }
+}
+
+// Pipeline/Kanban board responsive
+.pipeline-board {
+  flex-direction: column;
+
+  @include respond-to(lg) {
+    flex-direction: row;
+  }
+
+  .pipeline-column {
+    width: 100%;
+    margin-bottom: 1rem;
+
+    @include respond-to(lg) {
+      min-width: 300px;
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Data table responsive
+.data-table-container {
+  overflow-x: auto;
+
+  table {
+    min-width: 600px;
+
+    @include respond-to(md) {
+      min-width: auto;
+    }
+  }
+}
+
+// Hide/show elements based on screen size
+.mobile-only {
+  @include respond-to(md) {
+    display: none !important;
+  }
+}
+
+.desktop-only {
+  display: none !important;
+
+  @include respond-to(md) {
+    display: block !important;
+  }
+}
+
+// Responsive padding
+.container-fluid {
+  @include respond-to(sm) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @include respond-to(lg) {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+// Responsive font sizes
+h1, .h1 {
+  font-size: 1.75rem;
+
+  @include respond-to(md) {
+    font-size: 2rem;
+  }
+
+  @include respond-to(lg) {
+    font-size: 2.5rem;
+  }
+}
+
+h2, .h2 {
+  font-size: 1.5rem;
+
+  @include respond-to(md) {
+    font-size: 1.75rem;
+  }
+
+  @include respond-to(lg) {
+    font-size: 2rem;
+  }
+}
+
+// Responsive stat cards
+.stat-value {
+  font-size: 1.5rem !important;
+
+  @include respond-to(md) {
+    font-size: 2rem !important;
+  }
+}
+
+// Responsive buttons
+.btn {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+
+  @include respond-to(md) {
+    font-size: 1rem;
+    padding: 0.5rem 1.25rem;
+  }
+}
+
+// Responsive forms
+.form-section {
+  padding: 1rem;
+
+  @include respond-to(md) {
+    padding: 1.5rem;
+  }
+}
+
